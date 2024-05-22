@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HTML Document Reviewer</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 20px;
+			}
+			#inputArea {
+				width: 100%;
+			}
+			.document-container {
+				border: 1px solid #ddd;
+				margin: 10px 0;
+				padding: 10px;
+			}
+
+			#outputContainer h1 {
+				color: red;
+				background-color: darkred;
+			}
+
+			#outputContainer h2::after {
+				content: "h2";
+				display: inline-block;
+				margin: 0 5px;
+				color: rgb(29, 0, 134);
+				font-size: 0.8em;
+			}
+
+			#outputContainer h3::after {
+				content: "h3";
+				display: inline-block;
+				margin: 0 5px;
+				color: rgb(160, 160, 160);
+				font-weight: lighter;
+				font-size: 0.7em;
+			}
+		</style>
+	</head>
+	<body>
+		<textarea id="inputArea" placeholder="Click here to paste your HTML content..."></textarea>
+		<!-- add two radio buttons to select between structures and raw html -->
+		<div id="regimeContainer">
+			<input type="radio" id="regimeRaw" name="regime" value="raw" />
+			<label for="regimeRaw">Полный HTML</label>
+			<input type="radio" id="regimeStruct" name="regime" value="struct" />
+			<label for="regimeStruct">Только струкутра</label>
+		</div>
+
+		<div id="outputContainer"></div>
+
+		<script>
+			function copyFromClipboard() {
+				return new Promise((resolve, reject) => {
+					navigator.clipboard
+						.readText()
+						.then((text) => {
+							const inputArea = document.getElementById("inputArea")
+							inputArea.value = text
+							resolve()
+						})
+						.catch((err) => {
+							console.error("Failed to read clipboard contents: ", err)
+							reject(err)
+						})
+				})
+			}
+
+			async function analyzeTextarea() {
+				const inputArea = document.getElementById("inputArea")
+				const outputContainer = document.getElementById("outputContainer")
+
+				outputContainer.innerHTML = "" // Clear previous results
+
+				const htmlContent = inputArea.value
+				const documents = htmlContent.split(/-----/) // Split by delimiter
+
+				const regime = document.querySelector('input[name="regime"]:checked').value
+
+				documents.forEach((doc, index) => {
+					const docContainer = document.createElement("div")
+					docContainer.className = "document-container"
+
+					const docTitle = document.createElement("h2")
+					docTitle.textContent = `№${index + 1} длина: ${doc.length} симв.`
+					docContainer.appendChild(docTitle)
+
+					doc = doc
+						.replace(/^\s*"\s*|\s*"\s*$/g, "")
+						.replace(/""/g, '"')
+						.replace(/""/g, '"')
+
+					const docContent = document.createElement("div")
+					docContent.innerHTML = regime === "struct" ? updateHeadingStructure(doc) : doc
+					docContainer.appendChild(docContent)
+
+					outputContainer.appendChild(docContainer)
+				})
+			}
+
+			function updateHeadingStructure(formatted) {
+				const parser = new DOMParser()
+				const doc = parser.parseFromString(formatted, "text/html")
+				const headings = doc.querySelectorAll("h1, h2, h3, ol, ul, dl, table, p") // Added table to the selector
+				let structure = "<ul>"
+
+				// Check for <h1> tags and show warning if present
+				const h1Tags = doc.querySelectorAll("h1")
+				if (h1Tags.length > 0) {
+					structure += "<li style='color: red;'>Warning: <h1> tag detected</li>"
+				}
+
+				// Process headings
+				headings.forEach((heading) => {
+					let tagName = heading.tagName.toLowerCase()
+					if (tagName === "h2") {
+						structure += `<li><strong>${heading.textContent}</strong>`
+					} else if (tagName === "h3") {
+						structure += `<ul><li>${heading.textContent}</li></ul>`
+					} else if (["ol", "ul", "dl"].includes(tagName)) {
+						const length = heading.querySelectorAll("li").length
+						structure += `<ul><div class="list">List (${length} items)</div></ul>`
+					} else if (tagName === "table") {
+						const rowslength = heading.querySelectorAll("tr").length
+						structure += `<ul><li>Table (${rowslength} rows)</li></ul>`
+					} else if (tagName === "p") {
+						structure += `<ul><div style="color: darkgrey">p (${heading.textContent.length} ch)</div></ul>`
+					}
+				})
+
+				structure += "</ul>"
+
+				return structure
+			}
+
+			document.getElementById("inputArea").addEventListener("click", async () => {
+				await copyFromClipboard()
+				// save to local storage
+				localStorage.setItem("original", document.getElementById("inputArea").value)
+				await analyzeTextarea()
+			})
+
+			// Listen for regime change
+			document.getElementById("regimeContainer").addEventListener("change", () => {
+				const regime = document.querySelector('input[name="regime"]:checked').value
+				localStorage.setItem("regime", regime)
+				analyzeTextarea()
+			})
+
+			// on document load load from local storage
+			document.addEventListener("DOMContentLoaded", () => {
+				const original = localStorage.getItem("original")
+				if (original) {
+					document.getElementById("inputArea").value = original
+				}
+
+				const savedRegime = localStorage.getItem("regime")
+				if (savedRegime) {
+					document.querySelector(`input[name="regime"][value="${savedRegime}"]`).checked = true
+				} else {
+					document.querySelector(`input[name="regime"][value="raw"]`).checked = true
+				}
+
+				analyzeTextarea()
+			})
+		</script>
+	</body>
+</html>
