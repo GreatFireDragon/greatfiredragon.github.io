@@ -5,6 +5,11 @@ import re
 # https://paste.pics/d814be07628bd08b0df3e8f7c3b535be
 def remove_lonely_h3(cleared):
     index = cleared.find("<h2>Итог</h2>")
+    if index == -1:
+        index = cleared.find("<h2>Часто задаваемые вопросы</h2>")
+    if index == -1:
+        return cleared
+        
     part_before_itog = cleared[:index]
     doc = BeautifulSoup(part_before_itog, "html.parser")
 
