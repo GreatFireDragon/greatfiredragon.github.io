@@ -3,7 +3,10 @@ const {JSDOM} = require("jsdom")
 //  Removes lonely h3 elements that are not surrounded by other content.
 //  https://paste.pics/d814be07628bd08b0df3e8f7c3b535be
 function removeLonelyH3(cleared) {
-	const index = cleared.indexOf("<h2>Итог</h2>")
+	const index = cleared.indexOf("<h2>Часто задаваемые вопросы</h2>")
+	if (index === -1) index = cleared.indexOf("<h2>Итог</h2>")
+	if (index === -1) return cleared
+
 	let partBeforeItog = cleared.slice(0, index)
 	const {document} = new JSDOM(partBeforeItog).window
 	const doc = document
@@ -26,6 +29,8 @@ function removeLonelyH3(cleared) {
 			partBeforeItog = partBeforeItog.replace(h3s[0].outerHTML, "")
 		}
 	})
+
+	// console.log(partBeforeItog)
 
 	return partBeforeItog + cleared.slice(index)
 }
@@ -68,7 +73,7 @@ function modifyHeadings(cleared) {
 
 	// Get the part of the text after the "Итог" section.
 	let partAfterItog = cleared.split("<h2>Итог</h2>")[1]
-	console.log("modified headings 👌")
+	// console.log("modified headings 👌")
 	// Return the modified text.
 	return partBeforeItog + "<h2>Итог</h2>" + (partAfterItog || "")
 }
@@ -123,7 +128,7 @@ function onlyOneHeading(cleared) {
 
 function formatOriginal(original) {
 	// Удалить ненужные тэги
-	const tags2trim = ["html", "body", "header", "head", "article", "aside", "section", "footer"]
+	const tags2trim = ["html", "body", "header", "head", "article", "aside", "section", "footer", "!DOCTYPE html", "meta", "title"]
 	const tags2delete = ["title"]
 	let cleared = original
 
@@ -138,14 +143,14 @@ function formatOriginal(original) {
 
 	// delete everything inside of tags2delete
 	tags2delete.forEach((tag) => {
-		cleared = cleared.replace(new RegExp(`<.*${tag}.*>.*<\/${tag}>`, "gi"), "")
+		cleared = cleared.replace(new RegExp(`<\s*${tag}>[^\/]*<\/${tag}>`, "gi"), "")
+		cleared = cleared.replace(new RegExp(`<\s*${tag}[^\/]*\/${tag}>`, "gi"), "")
 	})
 	// trim only tags themself of tags2trim
 	tags2trim.forEach((tag) => {
-		cleared = cleared.replace(new RegExp(`<.*${tag}.*>|<\/${tag}>`, "gi"), "")
+		cleared = cleared.replace(new RegExp(`<${tag}[^>]*>|<\/${tag}>`, "gi"), "")
 	})
 	// trim meta tag
-	cleared = cleared.replace(/<meta.*>/g, "")
 
 	cleared = cleared.replace(/^\s+|\s+$/g, "")
 	// Текст должен начинаться с <p>, поэтому удаляю лишние "первые" заголовки
