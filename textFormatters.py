@@ -9,13 +9,14 @@ def remove_lonely_h3(cleared):
         index = cleared.find("<h2>Часто задаваемые вопросы</h2>")
     if index == -1:
         return cleared
-        
+
     part_before_itog = cleared[:index]
     doc = BeautifulSoup(part_before_itog, "html.parser")
 
     # Iterate over each h2 element before the "Итог" section
     for h2 in doc.find_all("h2"):
         next_h2 = h2.find_next_sibling("h2")
+
 
         # Get the elements between the current h2 and the next one
         elements_between = []
@@ -73,11 +74,12 @@ def modify_headings(cleared):
     # Convert all h1 headings to h2 headings.
     part_before_itog = part_before_itog.replace("<h1>", "<h2>").replace("</h1>", "</h2>")
 
-    # Get the part of the text after the "Итог" section.
-    part_after_itog = cleared.split("<h2>Итог</h2>")[1]
-    print("modified headings 👌")
+# Safely get the part of the text after the "Итог" section to avoid index out of range error.
+    parts = cleared.split("<h2>Итог</h2>")
+    part_after_itog = parts[1] if len(parts) > 1 else ""
+        
     # Return the modified text.
-    return part_before_itog + "<h2>Итог</h2>" + (part_after_itog or "")
+    return part_before_itog + "<h2>Итог</h2>" + part_after_itog
 
 
 # Basically: Если вопросы у FAQ в виде H2, H2 → H3
