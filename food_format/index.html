@@ -1,96 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Text Formatter</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				display: flex;
-				justify-content: space-between;
-				padding: 20px;
-				height: 90vh;
-			}
-			.formatter-container {
-				width: 48%;
-				display: flex;
-				flex-direction: column;
-			}
-			textarea {
-				flex-grow: 1;
-				width: 100%;
-				margin-bottom: 10px;
-				resize: none;
-			}
-			h2 {
-				margin-top: 0;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="formatter-container">
-			<h2>Input Text (Formatter 1)</h2>
-			<textarea id="inputText1" placeholder="Paste your text here..."></textarea>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Formatter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            height: 100vh;
+        }
+        .formatter-container {
+            width: 32%;
+            display: flex;
+            flex-direction: column;
+        }
+        textarea {
+            flex-grow: 1;
+            width: 100%;
+            margin-bottom: 10px;
+            height: 45%;
+            resize: none;
+        }
+        .formatter-1 textarea {
+            background-color: #f8d7da; /* Light red */
+        }
+        .formatter-2 textarea {
+            background-color: #d4edda; /* Light green */
+        }
+        .formatter-3 textarea {
+            background-color: #d1ecf1; /* Light blue */
+        }
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
 
-			<h2>Formatted Text 1 (Click to Copy)</h2>
-			<textarea id="outputText1" readonly onclick="copyToClipboard('outputText1')"></textarea>
-		</div>
+<div class="formatter-container formatter-1">
+    <h2>Input Text (Formatter 1)</h2>
+    <textarea id="inputText1" placeholder="Paste your text here..."></textarea>
 
-		<div class="formatter-container">
-			<h2>Input Text (Formatter 2)</h2>
-			<textarea id="inputText2" placeholder="Paste your text here..."></textarea>
+    <h2>Formatted Text 1 (Click to Copy)</h2>
+    <textarea id="outputText1" readonly onclick="copyToClipboard('outputText1')"></textarea>
+</div>
 
-			<h2>Formatted Text 2 (Click to Copy)</h2>
-			<textarea id="outputText2" readonly onclick="copyToClipboard('outputText2')"></textarea>
-		</div>
+<div class="formatter-container formatter-2">
+    <h2>Input Text (Formatter 2)</h2>
+    <textarea id="inputText2" placeholder="Paste your text here..."></textarea>
 
-		<script>
-			document.getElementById("inputText1").addEventListener("paste", function (event) {
-				setTimeout(formatText1, 0)
-			})
+    <h2>Formatted Text 2 (Click to Copy)</h2>
+    <textarea id="outputText2" readonly onclick="copyToClipboard('outputText2')"></textarea>
+</div>
 
-			document.getElementById("inputText2").addEventListener("paste", function (event) {
-				setTimeout(formatText2, 0)
-			})
+<div class="formatter-container formatter-3">
+    <h2>Input Text (Formatter 3)</h2>
+    <textarea id="inputText3" placeholder="Paste your text here..."></textarea>
 
-			function formatText1() {
-				const input = document.getElementById("inputText1").value
-				const lines = input.split("\n")
-				let formattedLines = []
+    <h2>Formatted Text 3 (Click to Copy)</h2>
+    <textarea id="outputText3" readonly onclick="copyToClipboard('outputText3')"></textarea>
+</div>
 
-				lines.forEach((line) => {
-					const trimmedLine = line.replace(/:\s*\d+$/, "").trim()
-					if (trimmedLine) {
-						formattedLines.push(trimmedLine)
-					}
-				})
+<script>
+    document.getElementById('inputText1').addEventListener('paste', function (event) {
+        setTimeout(formatText1, 0);
+    });
 
-				const formattedText = formattedLines.join("\n")
-				document.getElementById("outputText1").value = formattedText
-			}
+    document.getElementById('inputText2').addEventListener('paste', function (event) {
+        setTimeout(formatText2, 0);
+    });
 
-			function formatText2() {
-				const input = document.getElementById("inputText2").value
-				const lines = input.split("\n")
-				let formattedLines = []
+    document.getElementById('inputText3').addEventListener('paste', function (event) {
+        setTimeout(formatText3, 0);
+    });
 
-				lines.forEach((line) => {
-					const trimmedLine = line.trim()
-					if (trimmedLine && trimmedLine !== "Ключи из тематики") {
-						formattedLines.push(trimmedLine)
-					}
-				})
+    function formatText1() {
+        const input = document.getElementById('inputText1').value;
+        const lines = input.split('\n');
+        let formattedLines = [];
 
-				const formattedText = formattedLines.join("\n")
-				document.getElementById("outputText2").value = formattedText
-			}
+        lines.forEach(line => {
+            const trimmedLine = line.replace(/:\s*\d+$/, '').trim();
+            if (trimmedLine) {
+                formattedLines.push(trimmedLine);
+            }
+        });
 
-			function copyToClipboard(elementId) {
-				const outputText = document.getElementById(elementId)
-				outputText.select()
-				document.execCommand("copy")
-			}
-		</script>
-	</body>
+        const formattedText = formattedLines.join('\n');
+        document.getElementById('outputText1').value = formattedText;
+    }
+
+    function formatText2() {
+        const input = document.getElementById('inputText2').value;
+        const lines = input.split('\n');
+        let formattedLines = [];
+
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine && trimmedLine !== 'Ключи из тематики') {
+                formattedLines.push(trimmedLine);
+            }
+        });
+
+        const formattedText = formattedLines.join('\n');
+        document.getElementById('outputText2').value = formattedText;
+    }
+
+    function formatText3() {
+        const input = document.getElementById('inputText3').value;
+        const lines = input.split('\n');
+        let formattedLines = [];
+
+        lines.forEach(line => {
+            const formattedLine = line.replace(/<H1>/g, 'H1 -').replace(/<H2>/g, 'H2 -').trim();
+            if (formattedLine) {
+                formattedLines.push(formattedLine);
+            }
+        });
+
+        const formattedText = formattedLines.join('\n');
+        document.getElementById('outputText3').value = formattedText;
+    }
+
+    function copyToClipboard(elementId) {
+        const outputText = document.getElementById(elementId);
+        outputText.select();
+        document.execCommand('copy');
+    }
+</script>
+
+</body>
 </html>
