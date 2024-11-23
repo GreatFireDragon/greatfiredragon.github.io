@@ -1,7 +1,6 @@
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="en"><head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Text Formatter</title>
 		<style>
 			body {
@@ -99,11 +98,54 @@
 				const formattedText = formattedLines.join("\n")
 				document.getElementById("outputText1").value = formattedText
 			}
-
 			function formatText2() {
 				const input = document.getElementById("inputText2").value
 				const lines = input.split("\n")
 				let formattedLines = []
+				let counts = {} // Object to store the count of each item
+
+				// Helper function to normalize the keyword
+				function normalizeKeyword(keyword) {
+					// Normalize by removing extra spaces and converting to lower case
+					return keyword.trim().toLowerCase()
+				}
+
+				// Helper function to check if two phrases are similar based on common forms
+				function areSimilar(phrase1, phrase2) {
+					const trimmedPhrase1 = phrase1.trim().toLowerCase()
+					const trimmedPhrase2 = phrase2.trim().toLowerCase()
+
+					// Check if the phrases are identical
+					if (trimmedPhrase1 === trimmedPhrase2) return true
+
+					// Normalize phrases for comparison by removing common endings
+					const normalizeForComparison = (phrase) => {
+						const commonEndings = ["и", "а", "е", "о", "ы", "ов", "ек", "ки", "к", "ч", "у", "ю"]
+						let words = phrase.split(" ")
+						let normalizedWords = words.map((word) => {
+							for (const suffix of commonEndings) {
+								if (word.endsWith(suffix)) {
+									return word.slice(0, -suffix.length)
+								}
+							}
+							return word
+						})
+						return normalizedWords.join(" ")
+					}
+
+					// Extract base forms
+					const baseForm1 = normalizeForComparison(trimmedPhrase1)
+					const baseForm2 = normalizeForComparison(trimmedPhrase2)
+
+					// Simple heuristic: phrases with significant differences should not be considered similar
+					// For example, "грамм соли" and "грамм" or "соли" should not be considered similar
+					if (baseForm1 === baseForm2) {
+						// Check if they are similar based on the core meaning
+						return true
+					}
+
+					return false
+				}
 
 				lines.forEach((line) => {
 					let trimmedLine = line.trim()
@@ -113,9 +155,44 @@
 						if (indexOfParentheses !== -1) {
 							trimmedLine = trimmedLine.substring(0, indexOfParentheses)
 						}
-						formattedLines.push(trimmedLine.trim())
+
+						// Extract the keyword and count
+						const parts = trimmedLine.split(" - ")
+						if (parts.length === 2) {
+							const keyword = normalizeKeyword(parts[0])
+							const count = parseInt(parts[1].replace("раз", "").trim())
+
+							// Sum the counts for similar or duplicate keywords
+							let found = false
+							for (const existingKeyword in counts) {
+								if (areSimilar(keyword, existingKeyword)) {
+									counts[existingKeyword] += count
+									found = true
+									break
+								}
+							}
+							if (!found) {
+								counts[keyword] = count
+							}
+						}
 					}
 				})
+
+				// Function to determine the correct form of "раз"
+				function getCorrectForm(number) {
+					if (number % 10 === 1 && number % 100 !== 11) {
+						return "раз"
+					} else if ([2, 3, 4].includes(number % 10) && ![12, 13, 14].includes(number % 100)) {
+						return "раза"
+					} else {
+						return "раз"
+					}
+				}
+
+				// Create the formatted output
+				for (const [keyword, count] of Object.entries(counts)) {
+					formattedLines.push(`${keyword} - ${count} ${getCorrectForm(count)}`)
+				}
 
 				const formattedText = formattedLines.join("\n")
 				document.getElementById("outputText2").value = formattedText
@@ -143,5 +220,6 @@
 				document.execCommand("copy")
 			}
 		</script>
-	</body>
-</html>
+	
+
+</body></html>
