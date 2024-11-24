@@ -3,6 +3,7 @@
 	--line-color: #c1c1c1;
 	--line-height: 1.5em;
 	--font-size: 1.3em;
+	--color-textarea: #719ece;
 }
 
 body {
@@ -33,15 +34,14 @@ textarea {
 	flex-grow: 1;
 	width: 100%;
 	resize: none;
-	border: 1px solid #f4f4f4;
 	border-radius: 4px;
 	box-sizing: border-box;
 	overflow: auto;
 	background: repeating-linear-gradient(
 		to bottom,
 		var(--GFD-form-bg-color),
-		var(--GFD-form-bg-color) calc(var(--line-height) - 1px),
-		var(--line-color) calc(var(--line-height) - 1px),
+		var(--GFD-form-bg-color) calc(var(--line-height) - 2px),
+		var(--line-color) calc(var(--line-height) - 2px),
 		var(--line-color) var(--line-height)
 	);
 	background-clip: padding-box;
@@ -50,19 +50,17 @@ textarea {
 	font-size: var(--font-size);
 }
 
-h2 {
-	margin-top: 0;
-	font-size: 1.2em;
-	margin-bottom: 10px;
+textarea.textarea-animate {
+	animation: flash 1.1s linear infinite;
 }
-
-.textarea-animate {
-	animation: flash 1s;
+textarea:is(:focus, :hover, :active) {
+	outline: none !important;
+	border: 2px dashed var(--color-textarea);
+	box-shadow: 0 0 10px var(--color-textarea);
 }
-
 @keyframes flash {
 	0% {
-		box-shadow: 0 0 10px 2px #28a745;
+		box-shadow: 0 0 10px 2px orangered;
 	}
 	100% {
 		box-shadow: none;
@@ -94,14 +92,6 @@ h2 {
 /* Additional cute styling */
 body {
 	background-color: #fdfdfd;
-}
-
-h2 {
-	color: #333;
-}
-
-textarea {
-	transition: box-shadow 0.3s ease;
 }
 
 textarea:focus {
