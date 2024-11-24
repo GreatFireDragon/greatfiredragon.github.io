@@ -69,7 +69,7 @@ function copyToClipboard(id) {
 	document.execCommand("copy")
 }
 
-var AnimationDuration = 3 // seconds
+var AnimationDuration = 1 // seconds
 function animateTextarea(id) {
 	const textarea = document.getElementById(id)
 	textarea.classList.add("textarea-animate")

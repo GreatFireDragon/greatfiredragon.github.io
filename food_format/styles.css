@@ -51,7 +51,7 @@ textarea {
 }
 
 textarea.textarea-animate {
-	animation: flash 1.1s linear infinite;
+	animation: flash 1s linear infinite;
 }
 textarea:is(:focus, :hover, :active) {
 	outline: none !important;
