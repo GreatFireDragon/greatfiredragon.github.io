@@ -2,39 +2,73 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Directory Links</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 40px;
+				background-color: #f9f9f9;
+			}
+			h1 {
+				color: #333;
+			}
+			ul {
+				list-style-type: none;
+				padding: 0;
+			}
+			li {
+				margin: 8px 0;
+			}
+			a {
+				text-decoration: none;
+				color: #1e90ff;
+				font-size: 1.1em;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+		</style>
 	</head>
 	<body>
-		<h1>Links to Directories</h1>
-		<ul id="directory-list"></ul>
+		<h1>Available Directories</h1>
+		<ul id="directory-list">
+			<!-- Links will be dynamically inserted here -->
+		</ul>
 
 		<script>
-			// Function to fetch and display directories
-			async function fetchDirectories() {
-				try {
-					// Using the File System Access API for local filesystem access
-					const handle = await window.showDirectoryPicker()
-					const directoryList = document.getElementById("directory-list")
+			// Array of directory names
+			const directories = [
+				"project1",
+				"project2",
+				"blog",
+				"gallery",
+				"contact",
+				// Add more directory names as needed
+			]
 
-					for await (const [name, handle] of handle.entries()) {
-						if (handle.kind === "directory") {
-							const li = document.createElement("li")
-							const a = document.createElement("a")
-							a.href = `./${name}/`
-							a.textContent = name
-							li.appendChild(a)
-							directoryList.appendChild(li)
-						}
-					}
-				} catch (error) {
-					console.error("Error accessing directories:", error)
-					alert("Unable to access the directory. Please ensure you are running this locally and have the necessary permissions.")
-				}
+			// Reference to the <ul> element
+			const directoryList = document.getElementById("directory-list")
+
+			// Function to create and append list items
+			function generateDirectoryLinks() {
+				directories.forEach((dir) => {
+					// Create list item
+					const li = document.createElement("li")
+
+					// Create anchor tag
+					const a = document.createElement("a")
+					a.href = `./${dir}/` // Assumes each directory has an index.html or equivalent
+					a.textContent = dir.charAt(0).toUpperCase() + dir.slice(1) // Capitalize first letter
+
+					// Append anchor to list item, then list item to the list
+					li.appendChild(a)
+					directoryList.appendChild(li)
+				})
 			}
 
-			// Call the function when the script loads
-			fetchDirectories()
+			// Call the function on page load
+			window.onload = generateDirectoryLinks
 		</script>
 	</body>
 </html>
