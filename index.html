@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Directory Links</title>
+	</head>
+	<body>
+		<h1>Links to Directories</h1>
+		<ul id="directory-list"></ul>
+
+		<script>
+			// Function to fetch and display directories
+			async function fetchDirectories() {
+				try {
+					// Using the File System Access API for local filesystem access
+					const handle = await window.showDirectoryPicker()
+					const directoryList = document.getElementById("directory-list")
+
+					for await (const [name, handle] of handle.entries()) {
+						if (handle.kind === "directory") {
+							const li = document.createElement("li")
+							const a = document.createElement("a")
+							a.href = `./${name}/`
+							a.textContent = name
+							li.appendChild(a)
+							directoryList.appendChild(li)
+						}
+					}
+				} catch (error) {
+					console.error("Error accessing directories:", error)
+					alert("Unable to access the directory. Please ensure you are running this locally and have the necessary permissions.")
+				}
+			}
+
+			// Call the function when the script loads
+			fetchDirectories()
+		</script>
+	</body>
+</html>
