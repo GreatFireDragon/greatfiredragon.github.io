@@ -1,225 +1,53 @@
-<html lang="en"><head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
 		<title>Text Formatter</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				display: flex;
-				justify-content: space-between;
-				padding: 20px;
-				height: 100vh;
-			}
-			.formatter-container {
-				width: 32%;
-				display: flex;
-				flex-direction: column;
-			}
-			textarea {
-				flex-grow: 1;
-				width: 100%;
-				margin-bottom: 10px;
-				height: 45%;
-				resize: none;
-			}
-			.formatter-1 textarea {
-				background-color: #f8d7da; /* Light red */
-			}
-			.formatter-2 textarea {
-				background-color: #d4edda; /* Light green */
-			}
-			.formatter-3 textarea {
-				background-color: #d1ecf1; /* Light blue */
-			}
-			h2 {
-				margin-top: 0;
-			}
-		</style>
+		<link rel="stylesheet" href="styles.css" />
+		<link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=greatfiredragon.site" />
+		<script src="snowball.min.js"></script>
 	</head>
 	<body>
-		<div class="formatter-container formatter-1">
-			<h2>Input Text (Formatter 1)</h2>
-			<textarea id="inputText1" placeholder="Paste your text here..."></textarea>
+		<div class="input-container">
+			<div class="formatter-container formatter-1">
+				<textarea
+					id="inputText1"
+					placeholder="жиры и углеводы: 2
+глицерина и жирных: 1
+жиров и углеводов: 1
+..."
+					aria-labelledby="label-input1"></textarea>
+			</div>
 
-			<h2>Formatted Text 1 (Click to Copy)</h2>
-			<textarea id="outputText1" readonly=""></textarea>
+			<div class="formatter-container formatter-2">
+				<textarea
+					id="inputText2"
+					placeholder="кислот - 2 раза (в точной форме, как есть)
+энергии - 6 раз (в точной форме, как есть)
+..."
+					aria-labelledby="label-input2"></textarea>
+			</div>
+
+			<div class="formatter-container formatter-3">
+				<textarea id="inputText3" placeholder="Paste your text here..." aria-labelledby="label-input3"></textarea>
+			</div>
 		</div>
 
-		<div class="formatter-container formatter-2">
-			<h2>Input Text (Formatter 2)</h2>
-			<textarea id="inputText2" placeholder="Paste your text here..."></textarea>
+		<div class="output-container">
+			<div class="formatter-container formatter-1">
+				<textarea id="outputText1" readonly aria-labelledby="label-output1"></textarea>
+			</div>
 
-			<h2>Formatted Text 2 (Click to Copy)</h2>
-			<textarea id="outputText2" readonly=""></textarea>
+			<div class="formatter-container formatter-2">
+				<textarea id="outputText2" readonly aria-labelledby="label-output2"></textarea>
+			</div>
+
+			<div class="formatter-container formatter-3">
+				<textarea id="outputText3" readonly aria-labelledby="label-output3"></textarea>
+			</div>
 		</div>
 
-		<div class="formatter-container formatter-3">
-			<h2>Input Text (Formatter 3)</h2>
-			<textarea id="inputText3" placeholder="Paste your text here..."></textarea>
-
-			<h2>Formatted Text 3 (Click to Copy)</h2>
-			<textarea id="outputText3" readonly=""></textarea>
-		</div>
-
-		<script>
-			document.getElementById("inputText1").addEventListener("paste", function (event) {
-				setTimeout(() => {
-					formatText1()
-					copyToClipboard("outputText1")
-				}, 0)
-			})
-
-			document.getElementById("inputText2").addEventListener("paste", function (event) {
-				setTimeout(() => {
-					formatText2()
-					copyToClipboard("outputText2")
-				}, 0)
-			})
-
-			document.getElementById("inputText3").addEventListener("paste", function (event) {
-				setTimeout(() => {
-					formatText3()
-					copyToClipboard("outputText3")
-				}, 0)
-			})
-
-			function formatText1() {
-				const input = document.getElementById("inputText1").value
-				const lines = input.split("\n")
-				let formattedLines = []
-
-				lines.forEach((line) => {
-					const trimmedLine = line.replace(/:\s*\d+$/, "").trim()
-					if (trimmedLine) {
-						formattedLines.push(trimmedLine)
-					}
-				})
-
-				const formattedText = formattedLines.join("\n")
-				document.getElementById("outputText1").value = formattedText
-			}
-			function formatText2() {
-				const input = document.getElementById("inputText2").value
-				const lines = input.split("\n")
-				let formattedLines = []
-				let counts = {} // Object to store the count of each item
-
-				// Helper function to normalize the keyword
-				function normalizeKeyword(keyword) {
-					// Normalize by removing extra spaces and converting to lower case
-					return keyword.trim().toLowerCase()
-				}
-
-				// Helper function to check if two phrases are similar based on common forms
-				function areSimilar(phrase1, phrase2) {
-					const trimmedPhrase1 = phrase1.trim().toLowerCase()
-					const trimmedPhrase2 = phrase2.trim().toLowerCase()
-
-					// Check if the phrases are identical
-					if (trimmedPhrase1 === trimmedPhrase2) return true
-
-					// Normalize phrases for comparison by removing common endings
-					const normalizeForComparison = (phrase) => {
-						const commonEndings = ["и", "а", "е", "о", "ы", "ов", "ек", "ки", "к", "ч", "у", "ю"]
-						let words = phrase.split(" ")
-						let normalizedWords = words.map((word) => {
-							for (const suffix of commonEndings) {
-								if (word.endsWith(suffix)) {
-									return word.slice(0, -suffix.length)
-								}
-							}
-							return word
-						})
-						return normalizedWords.join(" ")
-					}
-
-					// Extract base forms
-					const baseForm1 = normalizeForComparison(trimmedPhrase1)
-					const baseForm2 = normalizeForComparison(trimmedPhrase2)
-
-					// Simple heuristic: phrases with significant differences should not be considered similar
-					// For example, "грамм соли" and "грамм" or "соли" should not be considered similar
-					if (baseForm1 === baseForm2) {
-						// Check if they are similar based on the core meaning
-						return true
-					}
-
-					return false
-				}
-
-				lines.forEach((line) => {
-					let trimmedLine = line.trim()
-					if (trimmedLine && trimmedLine !== "Ключи из тематики") {
-						// Remove the part in parentheses at the end of each line
-						const indexOfParentheses = trimmedLine.indexOf(" (")
-						if (indexOfParentheses !== -1) {
-							trimmedLine = trimmedLine.substring(0, indexOfParentheses)
-						}
-
-						// Extract the keyword and count
-						const parts = trimmedLine.split(" - ")
-						if (parts.length === 2) {
-							const keyword = normalizeKeyword(parts[0])
-							const count = parseInt(parts[1].replace("раз", "").trim())
-
-							// Sum the counts for similar or duplicate keywords
-							let found = false
-							for (const existingKeyword in counts) {
-								if (areSimilar(keyword, existingKeyword)) {
-									counts[existingKeyword] += count
-									found = true
-									break
-								}
-							}
-							if (!found) {
-								counts[keyword] = count
-							}
-						}
-					}
-				})
-
-				// Function to determine the correct form of "раз"
-				function getCorrectForm(number) {
-					if (number % 10 === 1 && number % 100 !== 11) {
-						return "раз"
-					} else if ([2, 3, 4].includes(number % 10) && ![12, 13, 14].includes(number % 100)) {
-						return "раза"
-					} else {
-						return "раз"
-					}
-				}
-
-				// Create the formatted output
-				for (const [keyword, count] of Object.entries(counts)) {
-					formattedLines.push(`${keyword} - ${count} ${getCorrectForm(count)}`)
-				}
-
-				const formattedText = formattedLines.join("\n")
-				document.getElementById("outputText2").value = formattedText
-			}
-
-			function formatText3() {
-				const input = document.getElementById("inputText3").value
-				const lines = input.split("\n")
-				let formattedLines = []
-
-				lines.forEach((line) => {
-					const formattedLine = line.replace(/<H1>/g, "H1 -").replace(/<H2>/g, "H2 -").trim()
-					if (formattedLine) {
-						formattedLines.push(formattedLine)
-					}
-				})
-
-				const formattedText = formattedLines.join("\n")
-				document.getElementById("outputText3").value = formattedText
-			}
-
-			function copyToClipboard(elementId) {
-				const outputText = document.getElementById(elementId)
-				outputText.select()
-				document.execCommand("copy")
-			}
-		</script>
-	
-
-</body></html>
+		<!-- Correctly closed script tag for your main script -->
+		<script src="script.js"></script>
+	</body>
+</html>
