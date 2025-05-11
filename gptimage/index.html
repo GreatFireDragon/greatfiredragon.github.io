@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Wrapper</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: sans-serif;
+        }
+
+        .form-wrapper {
+            width: 500px;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .form-wrapper iframe {
+            position: absolute;
+            top: -230px;
+            left: -140px;
+            width: 800px;
+            height: 900px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-wrapper">
+        <iframe id="signupIframe" src="https://4oimageapi.io/signup" title="Signup Form"></iframe>
+    </div>
+
+    <script>
+        const iframe = document.getElementById('signupIframe');
+
+        iframe.onload = function() {
+            console.log("Iframe loaded.");
+
+            // IMPORTANT: The code below to access and fill inputs inside the iframe
+            // WILL BE BLOCKED by browser security (Same-Origin Policy)
+            // because the iframe content is from a different domain.
+            // You cannot fill the form inputs directly from this script.
+
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+                // This line will likely cause a security error before it can even run
+                // if the iframe content is cross-origin and doesn't allow access.
+                const inputs = iframeDoc.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]'); // Targeting common input types
+
+                inputs.forEach(input => {
+                    // This part will not be reached if the above line fails
+                    console.log("Attempting to fill input:", input);
+                    input.value = "text"; // This action will be blocked
+                });
+
+                // You could try to find the form specifically, but still subject to SOP
+                // const form = iframeDoc.querySelector('form');
+                // if(form) {
+                //    console.log("Form found, but cannot access elements inside it directly.");
+                // }
+
+
+            } catch (e) {
+                console.error("Could not access iframe content due to cross-origin restrictions:", e);
+                consale.warn("Filling form inputs inside the iframe from the parent page is not possible due to browser security (Same-Origin Policy) for external websites.");
+            }
+        };
+    </script>
+
+</body>
+</html>
